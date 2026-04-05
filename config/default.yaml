@@ -1,0 +1,129 @@
+# 论文写作 Agent 系统 - 默认配置
+
+# 系统设置
+system:
+  name: "论文写作辅助系统"
+  version: "0.1.0"
+  language: "zh-CN"
+
+# MCP 服务器配置
+mcp_servers:
+  arxiv:
+    command: npx
+    args: ["-y", "mcp-server-arxiv"]
+    enabled: true
+    capabilities: [search, download, parse]
+
+  semantic_scholar:
+    command: npx
+    args: ["-y", "mcp-server-semantic-scholar"]
+    enabled: true
+    capabilities: [search, citations, references]
+
+  file_system:
+    command: npx
+    args: ["-y", "mcp-server-filesystem"]
+    enabled: true
+    allowed_paths: ["./projects"]
+
+  code_execution:
+    command: python
+    args: ["-m", "mcp_server_code"]
+    enabled: true
+    capabilities: [execute, plot, analyze]
+
+# 工具配置
+tools:
+  search_papers:
+    server: arxiv
+    description: "搜索 arXiv 论文"
+    cache_enabled: true
+    cache_ttl: 600
+
+  get_abstract:
+    server: arxiv
+    description: "获取论文摘要"
+    cache_enabled: true
+    cache_ttl: 3600
+
+  search_citations:
+    server: semantic_scholar
+    description: "搜索引用信息"
+    cache_enabled: true
+    cache_ttl: 1800
+
+# Agent 配置
+agents:
+  literature_agent:
+    max_papers: 50
+    search_timeout: 60
+    summary_max_length: 2000
+
+  gap_analysis_agent:
+    min_papers_for_analysis: 5
+    comparison_dimensions: [method, dataset, metrics, results]
+
+  method_agent:
+    novelty_threshold: 0.6
+    max_proposals: 3
+
+  experiment_agent:
+    default_baseline_count: 5
+    require_ablation: true
+
+  writing_agent:
+    output_format: latex
+    citation_style: "ieee"
+    section_max_length: 5000
+
+# 工作流配置
+workflow:
+  auto_save: true
+  checkpoint_on_confirm: true
+  allow_skip_stage: false
+  confirmations:
+    cp1:
+      type: question
+      required: true
+    cp2:
+      type: selection
+      required: true
+    cp3:
+      type: blocking
+      required: true
+    cp4:
+      type: blocking
+      required: true
+    cp5:
+      type: question
+      required: true
+    cp6:
+      type: blocking
+      required: true
+    cp7:
+      type: selection
+      required: true
+    cp8:
+      type: blocking
+      required: true
+    cp9:
+      type: editing
+      required: true
+    cp10:
+      type: blocking
+      required: true
+
+# 输出配置
+output:
+  project_dir: "./projects"
+  default_format: latex
+  auto_compile: true
+  export_formats: [pdf, markdown, docx]
+
+# 日志配置
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "./logs/paper_assistant.log"
+  max_size_mb: 10
+  backup_count: 5
