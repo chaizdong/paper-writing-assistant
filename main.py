@@ -269,6 +269,10 @@ def interactive_mode(cli: EnhancedCLI, state_manager: StateManager,
         elif command == "view":
             cli.cmd_view(args, context)
 
+        # MCP 工具状态
+        elif command == "mcp":
+            cli.cmd_mcp(args, context)
+
         # 导出
         elif command == "export":
             cli.cmd_export(context)

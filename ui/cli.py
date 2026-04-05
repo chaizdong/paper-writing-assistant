@@ -19,6 +19,9 @@ from .display import (
     display_experiment_plan, display_paper_draft, display_review_report,
     display_project_status, display_help
 )
+from mcp.tool_registry import get_registry
+from mcp.clients.arxiv_client import ArXivClient
+from mcp.clients.semantic_scholar_client import SemanticScholarClient
 from .interactive import ConfirmationHandler
 
 
@@ -82,6 +85,7 @@ class EnhancedCLI(CLI):
         "view experiment": "查看实验方案",
         "view paper [section]": "查看论文草稿",
         "review": "查看审阅报告",
+        "mcp": "查看 MCP 工具状态",
 
         # 项目管理
         "new": "创建新项目",
@@ -139,7 +143,7 @@ class EnhancedCLI(CLI):
 
         categories = {
             "工作流控制": ["run", "next", "rollback", "resume"],
-            "查看命令": ["status", "stage", "progress", "view"],
+            "查看命令": ["status", "stage", "progress", "view", "mcp"],
             "项目管理": ["new", "list", "switch", "export"],
             "帮助": ["help", "tutorial", "cheatsheet"],
         }
@@ -316,6 +320,64 @@ class EnhancedCLI(CLI):
 
         except (EOFError, KeyboardInterrupt):
             print()
+
+    # ==================== MCP 工具状态 ====================
+
+    def cmd_mcp(self, args: list[str], context: dict):
+        """mcp 命令实现 - 查看 MCP 工具状态"""
+        print_section_header("🔧 MCP 工具状态")
+
+        # 工具注册中心
+        registry = get_registry()
+        tools = registry.list_tools()
+        servers = registry.list_servers()
+
+        print(f"\n{bold('已注册工具')}: {len(tools)}")
+
+        tool_data = []
+        for tool in tools:
+            tool_data.append([
+                tool.get("name", ""),
+                tool.get("description", "")[:40],
+                tool.get("server_name", "local") or "local",
+            ])
+
+        if tool_data:
+            print_table(["工具名称", "描述", "类型"], tool_data)
+
+        # MCP 服务器状态
+        print(f"\n{bold('MCP 服务器')}: {len(servers)}")
+
+        if servers:
+            server_data = []
+            for server in servers:
+                status = "✓ 已连接" if server.get("connected") else "○ 未连接"
+                server_data.append([
+                    server.get("name", ""),
+                    status,
+                    ", ".join(server.get("capabilities", [])),
+                ])
+            print_table(["服务器", "状态", "能力"], server_data)
+        else:
+            print("  暂无配置的 MCP 服务器（使用内置 API 客户端）")
+
+        # 内置客户端状态
+        print(f"\n{bold('内置 API 客户端')}:")
+
+        try:
+            arxiv = ArXivClient(max_results=1)
+            print(f"  {Icons.SUCCESS} ArXivClient - 就绪")
+        except Exception:
+            print(f"  {Icons.ERROR} ArXivClient - 错误")
+
+        try:
+            ss = SemanticScholarClient(max_results=1)
+            print(f"  {Icons.SUCCESS} SemanticScholarClient - 就绪")
+        except Exception:
+            print(f"  {Icons.ERROR} SemanticScholarClient - 错误")
+
+        print(f"\n{Colors.DIM}提示：当前使用内置 API 客户端直接访问 arXiv 和 Semantic Scholar{Colors.RESET}")
+        print_divider()
 
     # ==================== 确认点交互 ====================
 

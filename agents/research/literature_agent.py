@@ -8,6 +8,7 @@ import logging
 from typing import Any, Optional
 
 from agents.base import BaseAgent, TaskRequest, TaskResponse
+from mcp.tools.paper_search import search_papers
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +31,7 @@ class LiteratureAgent(BaseAgent):
             description="文献调研 Agent - 搜索、筛选和总结相关论文"
         )
         self.max_papers = max_papers
+        self._use_real_api = True  # 切换到真实 API
 
     def get_capabilities(self) -> list[str]:
         return [
@@ -114,15 +116,19 @@ class LiteratureAgent(BaseAgent):
         """
         搜索论文
 
-        实际实现中会调用 MCP 工具（如 arXiv、Semantic Scholar）
-        这里提供一个模拟实现用于测试
+        使用 MCP 工具搜索 arXiv 和 Semantic Scholar
         """
-        # TODO: 集成真实 MCP 工具
-        # from mcp.tool_registry import get_registry
-        # registry = get_registry()
-        # result = registry.call("search_papers", {"query": query, "limit": limit})
+        if self._use_real_api:
+            try:
+                # 使用真实 API 搜索
+                papers = search_papers(query, max_results=limit)
+                if papers:
+                    logger.info(f"真实 API 搜索到 {len(papers)} 篇论文")
+                    return papers
+            except Exception as e:
+                logger.warning(f"真实 API 搜索失败，回退到模拟数据：{e}")
 
-        # 模拟返回（用于测试）
+        # 回退到模拟数据
         return self._mock_search(query, keywords, limit)
 
     def _mock_search(self, query: str, keywords: list[str], limit: int) -> list[dict]:

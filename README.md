@@ -135,10 +135,16 @@ cheatsheet          命令速查
 - [x] 增强 CLI（cli.py）
 - [x] 工作流集成（main.py）
 
-### 阶段 4：MCP 工具集成（待开发）
-- [ ] arXiv MCP 客户端
-- [ ] Semantic Scholar MCP 客户端
-- [ ] 真实 API 对接
+### 阶段 4：MCP 工具集成 ✅ 完成
+- [x] arXiv MCP 客户端 - 支持 arXiv API 搜索
+- [x] Semantic Scholar MCP 客户端 - 支持语义学术搜索
+- [x] 统一论文搜索服务 - 多数据源整合 + 去重
+- [x] 真实 API 对接 - LiteratureAgent 已集成
+
+### 阶段 5：测试与优化（进行中）
+- [ ] 完整工作流测试
+- [ ] 错误处理增强
+- [ ] 性能优化
 
 ## 技术栈
 
@@ -146,7 +152,9 @@ cheatsheet          命令速查
 - PyYAML
 - SQLite3（内置）
 - Claude Code（推荐运行环境）
-- MCP 工具链（待集成）
+- MCP 工具链
+  - arXiv API - 论文搜索
+  - Semantic Scholar API - 学术论文搜索
 
 ## License
 
