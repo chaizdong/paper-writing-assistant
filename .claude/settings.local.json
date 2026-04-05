@@ -12,7 +12,8 @@
       "Bash(git remote:*)",
       "Bash(git push:*)",
       "Bash(ssh-keygen:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(/Library/Frameworks/Python.framework/Versions/3.13/bin/python3:*)"
     ]
   }
 }

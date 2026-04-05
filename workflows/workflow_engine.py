@@ -52,7 +52,7 @@ LITERATURE_RESEARCH_STAGE = WorkflowStageDefinition(
     name="文献调研",
     description="搜索、筛选和总结相关文献",
     agents=["literature_agent", "summary_agent"],
-    confirmations=["cp1", "cp2"],
+    confirmations=["cp2"],  # CP1 已在创建项目时确认
 )
 
 GAP_ANALYSIS_STAGE = WorkflowStageDefinition(
