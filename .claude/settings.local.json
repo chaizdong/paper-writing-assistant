@@ -15,7 +15,8 @@
       "Bash(python:*)",
       "Bash(/Library/Frameworks/Python.framework/Versions/3.13/bin/python3:*)",
       "Bash(chmod +x:*)",
-      "Bash(timeout 5 uvicorn main:app --host 0.0.0.0 --port 8000)"
+      "Bash(timeout 5 uvicorn main:app --host 0.0.0.0 --port 8000)",
+      "Bash(./start.sh)"
     ]
   }
 }

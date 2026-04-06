@@ -14,7 +14,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from pydantic import BaseModel, Field
 
 # 导入现有系统模块
@@ -160,6 +160,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# 前端目录
+FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
+
 # CORS 配置
 app.add_middleware(
     CORSMiddleware,
@@ -171,16 +174,6 @@ app.add_middleware(
 
 
 # ==================== API 路由 ====================
-
-@app.get("/")
-async def root():
-    """API 根路径"""
-    return {
-        "name": "论文写作辅助系统 API",
-        "version": "1.0.0",
-        "status": "running",
-    }
-
 
 @app.get("/api/health")
 async def health_check():
@@ -351,9 +344,15 @@ async def send_stage_complete(project_id: str, stage: str, result: dict):
     })
 
 
-# ==================== 静态文件（生产环境） ====================
+# ==================== 前端页面服务 ====================
 
-# 前端构建输出目录
-# FRONTEND_DIST = Path(__file__).parent / "frontend" / "dist"
-# if FRONTEND_DIST.exists():
-#     app.mount("/", StaticFiles(directory=str(FRONTEND_DIST), html=True), name="static")
+@app.get("/", response_class=HTMLResponse)
+async def serve_frontend():
+    """提供前端页面"""
+    index_file = FRONTEND_DIR / "index.html"
+    if index_file.exists():
+        return index_file.read_text(encoding="utf-8")
+    return HTMLResponse(
+        content="<h1>前端页面不存在</h1><p>请确保 frontend/index.html 文件存在</p>",
+        status_code=404
+    )

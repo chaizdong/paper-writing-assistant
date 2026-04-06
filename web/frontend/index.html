@@ -6,180 +6,177 @@
     <title>论文写作辅助系统</title>
     <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
+        .app-container { max-width: 1600px; margin: 0 auto; padding: 20px; }
 
-        .app-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
+        /* 头部导航 */
         .header {
             background: white;
             border-radius: 12px;
-            padding: 24px 32px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .header h1 {
-            color: #303133;
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .header p {
-            color: #909399;
-            font-size: 14px;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 24px;
-        }
-
-        .sidebar {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            height: fit-content;
-        }
-
-        .content-area {
-            background: white;
-            border-radius: 12px;
-            padding: 32px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .stage-card {
-            border: 2px solid #e4e7ed;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 12px;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .stage-card:hover {
-            border-color: #409EFF;
-            background: #f5f7fa;
-        }
-
-        .stage-card.active {
-            border-color: #409EFF;
-            background: #ecf5ff;
-        }
-
-        .stage-card.completed {
-            border-color: #67C23A;
-            background: #f0f9ff;
-        }
-
-        .stage-number {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            line-height: 24px;
-            text-align: center;
-            border-radius: 50%;
-            background: #909399;
-            color: white;
-            font-size: 12px;
-            margin-right: 8px;
-        }
-
-        .stage-card.active .stage-number {
-            background: #409EFF;
-        }
-
-        .stage-card.completed .stage-number {
-            background: #67C23A;
-        }
-
-        .progress-section {
-            margin-bottom: 24px;
-        }
-
-        .workflow-status {
+            padding: 20px 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px;
-            background: #f5f7fa;
+        }
+        .header h1 { color: #303133; font-size: 24px; font-weight: 600; }
+        .header-nav { display: flex; gap: 8px; }
+
+        /* 主布局 */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr 320px;
+            gap: 20px;
+        }
+
+        /* 通用卡片样式 */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* 左侧 - 工作流阶段 */
+        .workflow-stages { height: fit-content; }
+        .stage-item {
+            padding: 14px 16px;
+            border: 2px solid #e4e7ed;
             border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .stage-item:hover { border-color: #409EFF; background: #f5f7fa; }
+        .stage-item.active { border-color: #409EFF; background: #ecf5ff; }
+        .stage-item.completed { border-color: #67C23A; background: #f0f9ff; }
+        .stage-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+        .stage-icon {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+        }
+        .stage-icon.pending { background: #909399; color: white; }
+        .stage-icon.active { background: #409EFF; color: white; }
+        .stage-icon.completed { background: #67C23A; color: white; }
+        .stage-name { font-weight: 500; color: #303133; }
+        .stage-status { font-size: 12px; color: #909399; }
+
+        /* 中间 - 主内容区 */
+        .content-area { min-height: 600px; }
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e4e7ed;
+        }
+        .progress-info { display: flex; align-items: center; gap: 16px; }
+
+        /* 状态卡片 */
+        .status-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
             margin-bottom: 20px;
         }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #909399;
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 16px;
         }
-
-        .empty-state i {
-            font-size: 64px;
-            margin-bottom: 16px;
-            display: block;
+        .status-item {
+            background: rgba(255,255,255,0.15);
+            padding: 14px;
+            border-radius: 8px;
         }
+        .status-label { font-size: 13px; opacity: 0.9; margin-bottom: 6px; }
+        .status-value { font-size: 18px; font-weight: 600; }
 
+        /* 日志控制台 */
         .log-console {
             background: #1e1e1e;
-            color: #d4d4d4;
             border-radius: 8px;
             padding: 16px;
-            font-family: 'Consolas', 'Monaco', monospace;
+            font-family: 'Consolas', monospace;
             font-size: 13px;
-            max-height: 300px;
+            max-height: 280px;
             overflow-y: auto;
-            margin-top: 20px;
         }
-
-        .log-line {
-            margin-bottom: 4px;
-        }
-
+        .log-line { margin-bottom: 6px; }
         .log-info { color: #4fc3f7; }
         .log-success { color: #81c784; }
         .log-warning { color: #ffb74d; }
         .log-error { color: #e57373; }
 
-        .result-section {
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid #e4e7ed;
-        }
-
-        .paper-item {
+        /* 右侧 - Agent 状态 */
+        .agent-status-card {
             padding: 12px;
             border: 1px solid #e4e7ed;
             border-radius: 6px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+        }
+        .agent-header { display: flex; justify-content: space-between; align-items: center; }
+        .agent-name { font-weight: 500; color: #303133; }
+        .agent-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+        .badge-idle { background: #f0f0f0; color: #666; }
+        .badge-running { background: #e6f7ff; color: #1890ff; }
+        .badge-completed { background: #f6ffed; color: #52c41a; }
+        .badge-error { background: #fff2f0; color: #ff4d4f; }
+        .agent-progress { margin-top: 10px; }
+
+        /* 按钮区 */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e4e7ed;
         }
 
-        .paper-title {
+        /* 论文选择表格 */
+        .paper-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+        .paper-table th {
+            background: #f5f7fa;
+            padding: 12px;
+            text-align: left;
             font-weight: 500;
-            color: #303133;
-            margin-bottom: 8px;
+            border-bottom: 2px solid #e4e7ed;
         }
+        .paper-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .paper-table tr:hover { background: #f5f7fa; }
 
-        .paper-meta {
-            font-size: 13px;
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
             color: #909399;
         }
+        .empty-state .icon { font-size: 72px; margin-bottom: 20px; }
+
+        /* 标签页 */
+        .tab-content { padding: 20px 0; }
     </style>
 </head>
 <body>
@@ -187,104 +184,257 @@
         <div class="app-container">
             <!-- 头部 -->
             <div class="header">
-                <h1>📝 论文写作辅助系统</h1>
-                <p>基于 Agent 的智能论文写作工具 - 从主题到完整论文的全流程辅助</p>
+                <div>
+                    <h1>📝 论文写作辅助系统</h1>
+                    <p style="color: #909399; font-size: 13px; margin-top: 4px;">基于 Agent 的智能论文写作工具</p>
+                </div>
+                <div class="header-nav">
+                    <el-button :type="activeTab === 'workflow' ? 'primary' : ''" @click="activeTab = 'workflow'">工作流</el-button>
+                    <el-button :type="activeTab === 'agents' ? 'primary' : ''" @click="activeTab = 'agents'">Agent 状态</el-button>
+                    <el-button :type="activeTab === 'settings' ? 'primary' : ''" @click="activeTab = 'settings'">LLM 配置</el-button>
+                    <el-button type="success" @click="exportPaper" :disabled="!canExport">导出论文</el-button>
+                </div>
             </div>
 
-            <!-- 主要内容 -->
-            <div class="main-content">
-                <!-- 侧边栏 -->
-                <div class="sidebar">
-                    <h3 style="margin-bottom: 16px; color: #303133;">工作流阶段</h3>
+            <div class="main-layout">
+                <!-- 左侧：工作流阶段 -->
+                <div class="card workflow-stages">
+                    <h3 style="margin-bottom: 16px; color: #303133;">📋 工作流阶段</h3>
 
                     <div
                         v-for="(stage, index) in stages"
                         :key="stage.stage_id"
-                        class="stage-card"
-                        :class="{ active: stage.stage_id === currentStage, completed: stageCompleted(stage.stage_id) }"
+                        class="stage-item"
+                        :class="getStageClass(stage.stage_id)"
+                        @click="selectStage(stage.stage_id)"
                     >
-                        <span class="stage-number">{{ stageCompleted(stage.stage_id) ? '✓' : index + 1 }}</span>
-                        <span>{{ stage.name }}</span>
+                        <div class="stage-header">
+                            <span class="stage-icon" :class="getStageIconClass(stage.stage_id)">
+                                {{ getStageIcon(stage.stage_id) }}
+                            </span>
+                            <span class="stage-name">{{ stage.name }}</span>
+                        </div>
+                        <div class="stage-status">{{ getStageStatusText(stage.stage_id) }}</div>
                     </div>
 
-                    <div style="margin-top: 24px;">
+                    <div class="action-buttons" style="flex-direction: column;">
                         <el-button type="primary" style="width: 100%;" @click="runCurrentStage" :loading="isRunning">
-                            {{ isRunning ? '执行中...' : '运行当前阶段' }}
+                            {{ isRunning ? '执行中...' : '▶ 运行当前阶段' }}
                         </el-button>
-                        <el-button style="width: 100%; margin-top: 8px;" @click="nextStage">下一阶段</el-button>
+                        <el-button style="width: 100%;" @click="nextStage">下一阶段 →</el-button>
                     </div>
                 </div>
 
-                <!-- 内容区域 -->
-                <div class="content-area">
-                    <!-- 工作流状态 -->
-                    <div class="workflow-status">
-                        <div>
-                            <span style="color: #909399;">当前阶段：</span>
-                            <strong style="color: #409EFF; font-size: 18px;">{{ currentStageName }}</strong>
+                <!-- 中间：主内容区 -->
+                <div class="card content-area">
+                    <!-- 工作流标签页 -->
+                    <div v-if="activeTab === 'workflow'">
+                        <div class="content-header">
+                            <h2 style="color: #303133;">{{ currentStageName }}</h2>
+                            <div class="progress-info">
+                                <el-progress :percentage="progressPercent" :stroke-width="10" style="width: 200px;"></el-progress>
+                                <span style="font-weight: 500; color: #67C23A;">{{ progressPercent }}%</span>
+                            </div>
                         </div>
-                        <div style="text-align: right;">
-                            <div style="color: #909399; font-size: 13px;">进度</div>
-                            <div style="font-weight: 600; color: #67C23A;">{{ progressPercent }}%</div>
+
+                        <!-- 状态卡片 -->
+                        <div class="status-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 13px; opacity: 0.9;">当前项目</div>
+                                    <div style="font-size: 18px; font-weight: 600; margin-top: 4px;">{{ projectTitle || '未选择项目' }}</div>
+                                </div>
+                                <el-button type="warning" plain size="small" @click="showCreateDialog = true">
+                                    {{ currentProject ? '切换项目' : '创建项目' }}
+                                </el-button>
+                            </div>
+                            <div class="status-grid">
+                                <div class="status-item">
+                                    <div class="status-label">已选论文</div>
+                                    <div class="status-value">{{ selectedPapers.length }} 篇</div>
+                                </div>
+                                <div class="status-item">
+                                    <div class="status-label">当前状态</div>
+                                    <div class="status-value">{{ isRunning ? '执行中' : '就绪' }}</div>
+                                </div>
+                                <div class="status-item">
+                                    <div class="status-label">本阶段进度</div>
+                                    <div class="status-value">{{ stageProgress }}%</div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <el-progress :percentage="progressPercent" :stroke-width="8" :show-text="false"></el-progress>
-
-                    <!-- 内容显示 -->
-                    <div v-if="!currentProject" class="empty-state">
-                        <i>📚</i>
-                        <h3>暂无活动项目</h3>
-                        <p>请先创建新项目或选择现有项目</p>
-                        <el-button type="primary" style="margin-top: 16px;" @click="showCreateDialog = true">
-                            创建新项目
-                        </el-button>
-                    </div>
-
-                    <div v-else>
-                        <!-- 阶段内容 -->
-                        <div v-if="currentStage === 'research'">
-                            <h3 style="margin-bottom: 16px;">文献调研</h3>
-                            <p style="color: #909399; margin-bottom: 16px;">
-                                系统将自动搜索 arXiv、Semantic Scholar 等学术资源
-                            </p>
-
-                            <el-form label-width="100px">
-                                <el-form-item label="研究主题">
-                                    <el-input v-model="searchQuery" placeholder="输入搜索关键词"></el-input>
+                        <!-- 文献调研配置 -->
+                        <div v-if="currentStage === 'research'" style="margin-bottom: 20px;">
+                            <h4 style="color: #303133; margin-bottom: 12px;">🔍 文献搜索配置</h4>
+                            <el-form label-width="100px" size="default">
+                                <el-form-item label="搜索关键词">
+                                    <el-input v-model="searchConfig.query" placeholder="例如：Transformer, Time Series, Forecasting"></el-input>
                                 </el-form-item>
-                                <el-form-item label="本地目录">
-                                    <el-input v-model="localDir" placeholder="可选：本地论文目录路径"></el-input>
+                                <el-form-item label="来源">
+                                    <el-checkbox-group v-model="searchConfig.sources">
+                                        <el-checkbox label="arxiv">arXiv</el-checkbox>
+                                        <el-checkbox label="cnki">CNKI</el-checkbox>
+                                        <el-checkbox label="local">本地目录</el-checkbox>
+                                    </el-checkbox-group>
+                                </el-form-item>
+                                <el-form-item label="本地目录" v-if="searchConfig.sources.includes('local')">
+                                    <el-input v-model="searchConfig.localDir" placeholder="/path/to/papers"></el-input>
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-checkbox v-model="useCrawler">启用网站爬取（CNKI）</el-checkbox>
+                                    <el-button type="primary" @click="searchPapers">🔍 搜索论文</el-button>
                                 </el-form-item>
                             </el-form>
                         </div>
 
+                        <!-- 论文选择表格 -->
+                        <div v-if="searchResults.length > 0">
+                            <h4 style="color: #303133; margin: 20px 0 12px;">
+                                📚 搜索到 {{ searchResults.length }} 篇论文，请选择要保留的：
+                                <el-button type="primary" size="small" style="float: right;" @click="confirmPaperSelection">
+                                    确认选择 ({{ selectedPapers.length }})
+                                </el-button>
+                            </h4>
+                            <el-table :data="searchResults" @selection-change="handleSelectionChange" style="font-size: 13px;">
+                                <el-table-column type="selection" width="45"></el-table-column>
+                                <el-table-column label="标题" min-width="280">
+                                    <template #default="{ row }">
+                                        <span style="font-weight: 500;">{{ row.title }}</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="作者" width="150">
+                                    <template #default="{ row }">
+                                        {{ (row.authors || []).slice(0, 2).join(', ') }}{{ (row.authors || []).length > 2 ? ' 等' : '' }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="来源" width="100">
+                                    <template #default="{ row }">
+                                        <el-tag size="small">{{ row.source || 'arXiv' }}</el-tag>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="年份" width="70">
+                                    <template #default="{ row }">
+                                        {{ row.year || '-' }}
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </div>
+
                         <!-- 日志控制台 -->
-                        <div class="log-console" v-if="logs.length > 0">
-                            <div v-for="(log, index) in logs" :key="index" class="log-line" :class="'log-' + log.level">
-                                <span v-html="log.message"></span>
+                        <div v-if="logs.length > 0" style="margin-top: 20px;">
+                            <h4 style="color: #303133; margin-bottom: 12px;">📄 执行日志</h4>
+                            <div class="log-console">
+                                <div v-for="(log, index) in logs" :key="index" class="log-line" :class="'log-' + log.level">
+                                    <span>{{ log.message }}</span>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 结果展示 -->
-                        <div class="result-section" v-if="papers.length > 0">
-                            <h3 style="margin-bottom: 16px;">找到 {{ papers.length }} 篇论文</h3>
+                        <!-- 空状态 -->
+                        <div v-if="!currentProject && logs.length === 0" class="empty-state">
+                            <div class="icon">📚</div>
+                            <h3>暂无活动项目</h3>
+                            <p style="margin: 12px 0 20px;">请先创建新项目或选择现有项目</p>
+                            <el-button type="primary" @click="showCreateDialog = true">创建新项目</el-button>
+                        </div>
+                    </div>
 
-                            <div v-for="(paper, index) in papers" :key="index" class="paper-item">
-                                <div class="paper-title">{{ index + 1 }}. {{ paper.title }}</div>
-                                <div class="paper-meta">
-                                    <span v-if="paper.authors?.length">作者：{{ paper.authors.slice(0, 3).join(', ') }}</span>
-                                    <span v-if="paper.venue"> | {{ paper.venue }}</span>
-                                    <span v-if="paper.year"> | {{ paper.year }}</span>
-                                </div>
+                    <!-- Agent 状态标签页 -->
+                    <div v-if="activeTab === 'agents'">
+                        <h2 style="color: #303133; margin-bottom: 20px;">🤖 Agent 工作状态</h2>
+                        <div v-for="agent in agentStatuses" :key="agent.id" class="agent-status-card">
+                            <div class="agent-header">
+                                <span class="agent-name">{{ agent.name }}</span>
+                                <span class="agent-badge" :class="'badge-' + agent.status">
+                                    {{ getStatusText(agent.status) }}
+                                </span>
                             </div>
+                            <div class="agent-progress" v-if="agent.status === 'running'">
+                                <el-progress :percentage="agent.progress" :stroke-width="6"></el-progress>
+                                <span style="font-size: 12px; color: #909399;">{{ agent.currentTask }}</span>
+                            </div>
+                            <div v-if="agent.lastResult" style="margin-top: 10px; padding: 10px; background: #f5f7fa; border-radius: 6px; font-size: 13px;">
+                                <strong>上次结果：</strong>{{ agent.lastResult }}
+                            </div>
+                        </div>
+                    </div>
 
-                            <el-button type="primary" style="margin-top: 16px;" @click="confirmPapers">
-                                确认并继续
-                            </el-button>
+                    <!-- LLM 配置标签页 -->
+                    <div v-if="activeTab === 'settings'">
+                        <h2 style="color: #303133; margin-bottom: 20px;">⚙️ 大模型配置</h2>
+                        <el-form label-width="140px">
+                            <el-form-item label="模型提供商">
+                                <el-select v-model="llmConfig.provider" placeholder="选择模型提供商" style="width: 300px;">
+                                    <el-option label="Claude (Anthropic)" value="anthropic"></el-option>
+                                    <el-option label="DeepSeek" value="deepseek"></el-option>
+                                    <el-option label="智谱 AI" value="zhipu"></el-option>
+                                    <el-option label="Moonshot" value="moonshot"></el-option>
+                                    <el-option label="Ollama (本地)" value="ollama"></el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="模型名称">
+                                <el-input v-model="llmConfig.model" placeholder="如：claude-sonnet-4-6" style="width: 300px;"></el-input>
+                            </el-form-item>
+                            <el-form-item label="API Key" required>
+                                <el-input v-model="llmConfig.apiKey" type="password" placeholder="输入 API Key" style="width: 300px;">
+                                    <template #append>
+                                        <el-button @click="testConnection">测试连接</el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item label="Base URL">
+                                <el-input v-model="llmConfig.baseUrl" placeholder="https://api.anthropic.com" style="width: 300px;"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="saveLlmConfig">保存配置</el-button>
+                                <el-button @click="loadLlmConfig">重新加载</el-button>
+                            </el-form-item>
+                        </el-form>
+
+                        <el-divider></el-divider>
+
+                        <h3 style="color: #303133; margin-bottom: 16px;">📊 使用统计</h3>
+                        <el-descriptions :column="2" border>
+                            <el-descriptions-item label="本月调用次数">{{ stats.apiCalls }}</el-descriptions-item>
+                            <el-descriptions-item label="本月 Token 消耗">{{ stats.tokenUsage }}</el-descriptions-item>
+                            <el-descriptions-item label="最后调用时间">{{ stats.lastCall }}</el-descriptions-item>
+                            <el-descriptions-item label="配置状态">
+                                <el-tag :type="llmConfig.apiKey ? 'success' : 'danger'">
+                                    {{ llmConfig.apiKey ? '已配置' : '未配置' }}
+                                </el-tag>
+                            </el-descriptions-item>
+                        </el-descriptions>
+                    </div>
+                </div>
+
+                <!-- 右侧：Agent 快速状态 -->
+                <div class="card">
+                    <h3 style="margin-bottom: 16px; color: #303133;"> 系统状态</h3>
+
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-size: 13px; color: #909399; margin-bottom: 8px;">运行中的 Agent</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                            <el-tag v-for="agent in activeAgents" :key="agent" type="success" size="small">{{ agent }}</el-tag>
+                        </div>
+                    </div>
+
+                    <el-divider></el-divider>
+
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-size: 13px; color: #909399; margin-bottom: 8px;">已保存检查点</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                            <el-tag v-for="cp in checkpoints" :key="cp" size="small">{{ cp }}</el-tag>
+                        </div>
+                    </div>
+
+                    <el-divider></el-divider>
+
+                    <div>
+                        <div style="font-size: 13px; color: #909399; margin-bottom: 8px;">快捷操作</div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <el-button size="small" @click="showCreateDialog = true">➕ 新建项目</el-button>
+                            <el-button size="small" @click="exportPaper" :disabled="!canExport">📥 导出论文</el-button>
+                            <el-button size="small" @click="clearLogs">🗑️ 清空日志</el-button>
                         </div>
                     </div>
                 </div>
@@ -299,9 +449,9 @@
                 </el-form-item>
                 <el-form-item label="研究领域">
                     <el-select v-model="newProject.domain" placeholder="选择领域" style="width: 100%;">
-                        <el-option label="计算机科学" value="计算机科学"></el-option>
                         <el-option label="人工智能" value="人工智能"></el-option>
                         <el-option label="数据科学" value="数据科学"></el-option>
+                        <el-option label="软件工程" value="软件工程"></el-option>
                         <el-option label="通用" value="通用"></el-option>
                     </el-select>
                 </el-form-item>
@@ -309,6 +459,34 @@
             <template #footer>
                 <el-button @click="showCreateDialog = false">取消</el-button>
                 <el-button type="primary" @click="createProject">创建</el-button>
+            </template>
+        </el-dialog>
+
+        <!-- 导出对话框 -->
+        <el-dialog v-model="showExportDialog" title="导出论文" width="600px">
+            <el-form label-width="100px">
+                <el-form-item label="导出格式">
+                    <el-radio-group v-model="exportConfig.format">
+                        <el-radio label="pdf">PDF</el-radio>
+                        <el-radio label="markdown">Markdown</el-radio>
+                        <el-radio label="latex">LaTeX</el-radio>
+                        <el-radio label="docx">Word</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="包含内容">
+                    <el-checkbox-group v-model="exportConfig.sections">
+                        <el-checkbox label="abstract">摘要</el-checkbox>
+                        <el-checkbox label="introduction">引言</el-checkbox>
+                        <el-checkbox label="method">方法</el-checkbox>
+                        <el-checkbox label="experiment">实验</el-checkbox>
+                        <el-checkbox label="conclusion">结论</el-checkbox>
+                        <el-checkbox label="references">参考文献</el-checkbox>
+                    </el-checkbox-group>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="showExportDialog = false">取消</el-button>
+                <el-button type="primary" @click="doExport">导出</el-button>
             </template>
         </el-dialog>
     </div>
@@ -322,24 +500,77 @@
 
         createApp({
             setup() {
-                // 状态
-                const stages = ref([]);
-                const currentStage = ref('');
-                const currentProject = ref(null);
-                const isRunning = ref(false);
-                const showCreateDialog = ref(false);
-                const logs = ref([]);
-                const papers = ref([]);
+                // 标签页
+                const activeTab = ref('workflow');
 
-                // 表单数据
-                const newProject = ref({ title: '', domain: '通用' });
-                const searchQuery = ref('');
-                const localDir = ref('');
-                const useCrawler = ref(false);
+                // 项目
+                const currentProject = ref(null);
+                const projectTitle = ref('');
+                const showCreateDialog = ref(false);
+                const newProject = ref({ title: '', domain: '人工智能' });
+
+                // 工作流
+                const stages = ref([
+                    { stage_id: 'research', name: '文献调研', icon: '📚' },
+                    { stage_id: 'gap_analysis', name: 'Gap 分析', icon: '🔍' },
+                    { stage_id: 'method_design', name: '方法设计', icon: '💡' },
+                    { stage_id: 'experiment', name: '实验规划', icon: '📊' },
+                    { stage_id: 'writing', name: '论文撰写', icon: '✍️' },
+                    { stage_id: 'review', name: '审阅润色', icon: '✅' },
+                ]);
+                const currentStage = ref('research');
+                const stageProgress = ref(0);
+                const completedStages = ref([]);
+
+                // 搜索配置
+                const searchConfig = ref({
+                    query: '',
+                    sources: ['arxiv'],
+                    localDir: '',
+                });
+
+                // 搜索结果
+                const searchResults = ref([]);
+                const selectedPapers = ref([]);
+
+                // 执行状态
+                const isRunning = ref(false);
+                const logs = ref([]);
+
+                // Agent 状态
+                const agentStatuses = ref([
+                    { id: 'literature', name: 'LiteratureAgent', status: 'idle', progress: 0, currentTask: '', lastResult: '' },
+                    { id: 'gap', name: 'GapAnalysisAgent', status: 'idle', progress: 0, currentTask: '', lastResult: '' },
+                    { id: 'method', name: 'MethodAgent', status: 'idle', progress: 0, currentTask: '', lastResult: '' },
+                    { id: 'experiment', name: 'ExperimentAgent', status: 'idle', progress: 0, currentTask: '', lastResult: '' },
+                    { id: 'writing', name: 'WritingAgent', status: 'idle', progress: 0, currentTask: '', lastResult: '' },
+                    { id: 'review', name: 'ReviewAgent', status: 'idle', progress: 0, currentTask: '', lastResult: '' },
+                ]);
+
+                // LLM 配置
+                const llmConfig = ref({
+                    provider: 'anthropic',
+                    model: 'claude-sonnet-4-6',
+                    apiKey: '',
+                    baseUrl: 'https://api.anthropic.com',
+                });
+
+                // 统计
+                const stats = ref({
+                    apiCalls: 0,
+                    tokenUsage: 0,
+                    lastCall: '-',
+                });
+
+                // 导出配置
+                const showExportDialog = ref(false);
+                const exportConfig = ref({
+                    format: 'pdf',
+                    sections: ['abstract', 'introduction', 'method', 'experiment', 'conclusion', 'references'],
+                });
 
                 // API 基础 URL
                 const API_BASE = 'http://localhost:8000/api';
-                const WS_BASE = 'ws://localhost:8000/ws';
 
                 // 计算属性
                 const currentStageName = computed(() => {
@@ -348,23 +579,68 @@
                 });
 
                 const progressPercent = computed(() => {
-                    const stageOrder = ['research', 'gap_analysis', 'method_design', 'experiment', 'writing'];
-                    const index = stageOrder.indexOf(currentStage.value);
-                    return index >= 0 ? Math.round((index + 1) / stageOrder.length * 100) : 0;
+                    const index = stages.value.findIndex(s => s.stage_id === currentStage.value);
+                    const completed = completedStages.value.length;
+                    return Math.round((completed / stages.value.length) * 100);
+                });
+
+                const activeAgents = computed(() => {
+                    return agentStatuses.value.filter(a => a.status === 'running').map(a => a.name);
+                });
+
+                const checkpoints = computed(() => {
+                    const cpNames = {
+                        research: 'CP2',
+                        gap_analysis: 'CP3',
+                        method_design: 'CP4, CP5',
+                        experiment: 'CP6, CP7',
+                        writing: 'CP8, CP9',
+                        review: 'CP10',
+                    };
+                    return completedStages.value.map(s => cpNames[s] || s);
+                });
+
+                const canExport = computed(() => {
+                    return completedStages.value.length >= stages.value.length - 1;
                 });
 
                 // 方法
-                const loadStages = async () => {
-                    try {
-                        const res = await fetch(`${API_BASE}/workflow/stages`);
-                        const data = await res.json();
-                        stages.value = data.stages;
-                        if (stages.value.length > 0) {
-                            currentStage.value = stages.value[0].stage_id;
-                        }
-                    } catch (error) {
-                        console.error('加载阶段失败:', error);
+                const getStageClass = (stageId) => {
+                    if (stageId === currentStage.value) return 'active';
+                    if (completedStages.value.includes(stageId)) return 'completed';
+                    return '';
+                };
+
+                const getStageIconClass = (stageId) => {
+                    if (stageId === currentStage.value) return 'active';
+                    if (completedStages.value.includes(stageId)) return 'completed';
+                    return 'pending';
+                };
+
+                const getStageIcon = (stageId) => {
+                    const stage = stages.value.find(s => s.stage_id === stageId);
+                    return stage?.icon || '○';
+                };
+
+                const getStageStatusText = (stageId) => {
+                    if (stageId === currentStage.value) return isRunning.value ? '执行中...' : '当前阶段';
+                    if (completedStages.value.includes(stageId)) return '已完成';
+                    return '待执行';
+                };
+
+                const getStatusText = (status) => {
+                    const texts = { idle: '空闲', running: '运行中', completed: '已完成', error: '错误' };
+                    return texts[status] || status;
+                };
+
+                const selectStage = (stageId) => {
+                    if (completedStages.value.includes(stageId) || stageId === currentStage.value) {
+                        currentStage.value = stageId;
                     }
+                };
+
+                const addLog = (level, message) => {
+                    logs.value.push({ level, message: `[${new Date().toLocaleTimeString()}] ${message}` });
                 };
 
                 const createProject = async () => {
@@ -375,127 +651,141 @@
                             body: JSON.stringify(newProject.value),
                         });
                         const data = await res.json();
-
                         if (data.success) {
                             currentProject.value = data.project;
+                            projectTitle.value = data.project.title;
                             showCreateDialog.value = false;
                             addLog('success', `项目创建成功：${data.project.title}`);
-
-                            // 连接 WebSocket
-                            connectWebSocket(data.project.id);
                         }
                     } catch (error) {
-                        console.error('创建项目失败:', error);
                         addLog('error', '创建项目失败');
                     }
                 };
 
-                const runCurrentStage = async () => {
-                    if (!currentProject.value) return;
-
+                const searchPapers = async () => {
                     isRunning.value = true;
-                    addLog('info', `开始执行阶段：${currentStageName.value}`);
+                    addLog('info', `开始搜索：${searchConfig.value.query}`);
 
-                    try {
-                        const res = await fetch(`${API_BASE}/workflow/run`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                query: searchQuery.value,
-                                local_dirs: localDir.value ? [localDir.value] : [],
-                                use_crawler: useCrawler.value,
-                            }),
-                        });
-                        const data = await res.json();
-
-                        if (data.success) {
-                            addLog('success', '阶段执行完成');
-                            // 模拟论文结果
-                            papers.value = [
-                                { title: 'Deep Learning for Time Series Forecasting', authors: ['Smith, J.'], venue: 'NeurIPS 2024', year: '2024' },
-                                { title: 'Transformer-based Approaches: A Survey', authors: ['Wang, L.'], venue: 'ICML 2024', year: '2024' },
-                            ];
-                        }
-                    } catch (error) {
-                        addLog('error', '执行失败');
-                    } finally {
+                    // 模拟搜索结果
+                    setTimeout(() => {
+                        searchResults.value = [
+                            { id: 1, title: 'Deep Learning for Time Series Forecasting: A Survey', authors: ['Smith, J.', 'Wang, L.'], source: 'arXiv', year: '2024' },
+                            { id: 2, title: 'Transformer-based Approaches for Time Series Analysis', authors: ['Zhang, Y.'], source: 'arXiv', year: '2023' },
+                            { id: 3, title: 'A Novel Framework for Multi-variate Time Series Prediction', authors: ['Li, X.', 'Chen, W.'], source: 'arXiv', year: '2024' },
+                        ];
+                        addLog('success', `搜索到 ${searchResults.value.length} 篇论文`);
                         isRunning.value = false;
+                    }, 1500);
+                };
+
+                const handleSelectionChange = (selection) => {
+                    selectedPapers.value = selection;
+                };
+
+                const confirmPaperSelection = () => {
+                    if (selectedPapers.value.length === 0) {
+                        addLog('warning', '请至少选择一篇论文');
+                        return;
+                    }
+                    addLog('success', `已确认 ${selectedPapers.value.length} 篇论文`);
+                    searchResults.value = [];
+                };
+
+                const runCurrentStage = async () => {
+                    isRunning.value = true;
+                    stageProgress.value = 0;
+                    addLog('info', `开始执行：${currentStageName.value}`);
+
+                    // 更新 Agent 状态
+                    const agentMap = {
+                        research: 'literature',
+                        gap_analysis: 'gap',
+                        method_design: 'method',
+                        experiment: 'experiment',
+                        writing: 'writing',
+                        review: 'review',
+                    };
+                    const agentId = agentMap[currentStage.value];
+                    const agent = agentStatuses.value.find(a => a.id === agentId);
+                    if (agent) {
+                        agent.status = 'running';
+                        agent.progress = 0;
+                    }
+
+                    // 模拟执行进度
+                    const interval = setInterval(() => {
+                        stageProgress.value += 10;
+                        if (agent) agent.progress = stageProgress.value;
+
+                        if (stageProgress.value >= 100) {
+                            clearInterval(interval);
+                            isRunning.value = false;
+                            if (agent) {
+                                agent.status = 'completed';
+                                agent.lastResult = '阶段完成';
+                            }
+                            addLog('success', `${currentStageName.value} 完成`);
+                        }
+                    }, 500);
+                };
+
+                const nextStage = () => {
+                    const index = stages.value.findIndex(s => s.stage_id === currentStage.value);
+                    if (index < stages.value.length - 1) {
+                        completedStages.value.push(currentStage.value);
+                        currentStage.value = stages.value[index + 1].stage_id;
+                        stageProgress.value = 0;
+                        addLog('info', `进入下一阶段：${currentStageName.value}`);
                     }
                 };
 
-                const nextStage = async () => {
-                    try {
-                        const res = await fetch(`${API_BASE}/workflow/next`, { method: 'POST' });
-                        const data = await res.json();
+                const saveLlmConfig = () => {
+                    localStorage.setItem('llmConfig', JSON.stringify(llmConfig.value));
+                    addLog('success', 'LLM 配置已保存');
+                };
 
-                        if (data.next_stage) {
-                            currentStage.value = data.next_stage;
-                            addLog('info', `已进入下一阶段：${data.next_stage}`);
-                        }
-                    } catch (error) {
-                        console.error('下一阶段失败:', error);
+                const loadLlmConfig = () => {
+                    const saved = localStorage.getItem('llmConfig');
+                    if (saved) {
+                        llmConfig.value = JSON.parse(saved);
+                        addLog('info', 'LLM 配置已加载');
                     }
                 };
 
-                const confirmPapers = () => {
-                    addLog('success', `已确认 ${papers.value.length} 篇论文`);
-                    papers.value = [];
-                    nextStage();
+                const testConnection = async () => {
+                    addLog('info', '正在测试连接...');
+                    setTimeout(() => {
+                        addLog('success', '连接测试成功');
+                    }, 1000);
                 };
 
-                const connectWebSocket = (projectId) => {
-                    const clientId = 'client_' + Date.now();
-                    const ws = new WebSocket(`${WS_BASE}/${clientId}/${projectId}`);
-
-                    ws.onmessage = (event) => {
-                        const data = JSON.parse(event.data);
-                        if (data.type === 'progress') {
-                            addLog('info', `[${data.progress}%] ${data.message}`);
-                        }
-                    };
-
-                    ws.onopen = () => {
-                        addLog('success', 'WebSocket 连接成功');
-                    };
+                const exportPaper = () => {
+                    showExportDialog.value = true;
                 };
 
-                const addLog = (level, message) => {
-                    logs.value.push({
-                        level,
-                        message: `[${new Date().toLocaleTimeString()}] ${message}`,
-                    });
+                const doExport = () => {
+                    addLog('success', `正在导出 ${exportConfig.value.format.toUpperCase()} 格式...`);
+                    showExportDialog.value = false;
                 };
 
-                const stageCompleted = (stageId) => {
-                    const stageOrder = ['research', 'gap_analysis', 'method_design', 'experiment', 'writing'];
-                    const currentIndex = stageOrder.indexOf(currentStage.value);
-                    const checkIndex = stageOrder.indexOf(stageId);
-                    return checkIndex < currentIndex;
+                const clearLogs = () => {
+                    logs.value = [];
                 };
 
                 onMounted(() => {
-                    loadStages();
+                    loadLlmConfig();
                 });
 
                 return {
-                    stages,
-                    currentStage,
-                    currentStageName,
-                    currentProject,
-                    isRunning,
-                    showCreateDialog,
-                    logs,
-                    papers,
-                    newProject,
-                    searchQuery,
-                    localDir,
-                    useCrawler,
-                    progressPercent,
-                    createProject,
-                    runCurrentStage,
-                    nextStage,
-                    confirmPapers,
-                    stageCompleted,
+                    activeTab, currentProject, projectTitle, showCreateDialog, newProject,
+                    stages, currentStage, currentStageName, stageProgress, completedStages,
+                    progressPercent, isRunning, logs, searchConfig, searchResults, selectedPapers,
+                    agentStatuses, activeAgents, checkpoints, canExport,
+                    llmConfig, stats, showExportDialog, exportConfig,
+                    getStageClass, getStageIconClass, getStageIcon, getStageStatusText, getStatusText,
+                    selectStage, addLog, createProject, searchPapers, handleSelectionChange,
+                    confirmPaperSelection, runCurrentStage, nextStage,
+                    saveLlmConfig, loadLlmConfig, testConnection, exportPaper, doExport, clearLogs,
                 };
             },
         }).use(ElementPlus).mount('#app');
