@@ -72,13 +72,41 @@ class ConfirmationHandler:
         print(f"\n{Colors.BOLD}{Colors.CYAN}═══ 确认点 CP2: 确认文献筛选结果 ═══{Colors.RESET}\n")
 
         papers = context.get('papers', [])
+
+        if not papers:
+            print_status("warning", "未找到相关论文，请选择补充来源：")
+            print("\n  [1] 扫描本地目录")
+            print("  [2] 爬取学术网站 (CNKI)")
+            print("  [3] 使用模拟数据（测试用）")
+            print("  [4] 取消操作")
+
+            try:
+                choice = input(f"{Colors.CYAN}请选择 (1-4):{Colors.RESET} ").strip()
+
+                if choice == '1':
+                    # 扫描本地目录
+                    directory = input(f"{Colors.CYAN}请输入论文目录路径:{Colors.RESET} ").strip()
+                    return False, {"rescan": True, "source": "local", "directory": directory}
+                elif choice == '2':
+                    # 爬取网站
+                    return False, {"rescan": True, "source": "crawler"}
+                elif choice == '3':
+                    # 使用模拟数据
+                    return True, {"use_mock": True}
+                else:
+                    return False, {}
+            except (EOFError, KeyboardInterrupt):
+                print()
+                return False, {}
+
         print(f"找到 {len(papers)} 篇相关论文：\n")
 
         for i, paper in enumerate(papers[:10], 1):
             title = paper.get('title', 'N/A')
             venue = paper.get('venue', '')
             year = paper.get('year', '')
-            print(f"  [{Colors.CYAN}{i}{Colors.RESET}] {title} ({venue}, {year})")
+            source = paper.get('source', 'arXiv')
+            print(f"  [{Colors.CYAN}{i}{Colors.RESET}] {title} ({venue}, {year}) [{source}]")
 
         if len(papers) > 10:
             print(f"\n  ... 还有 {len(papers) - 10} 篇")

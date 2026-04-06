@@ -2,13 +2,21 @@
 文献调研 Agent
 
 根据研究主题搜索、筛选和总结相关文献
+支持：
+- arXiv API 搜索
+- Semantic Scholar 搜索
+- 本地目录扫描
+- 学术网站爬虫（CNKI 等）
 """
 
 import logging
 from typing import Any, Optional
+from pathlib import Path
 
 from agents.base import BaseAgent, TaskRequest, TaskResponse
 from mcp.tools.paper_search import search_papers
+from mcp.tools.local_paper_search import scan_local_papers, search_local_papers
+from mcp.tools.academic_crawler import search_academic_websites
 
 logger = logging.getLogger(__name__)
 
@@ -24,18 +32,28 @@ class LiteratureAgent(BaseAgent):
     - 生成文献综述摘要
     """
 
-    def __init__(self, agent_id: str = "literature_agent", max_papers: int = 50):
+    def __init__(
+        self,
+        agent_id: str = "literature_agent",
+        max_papers: int = 50,
+        local_dirs: list[str] = None,
+        enable_crawler: bool = True,
+    ):
         super().__init__(
             agent_id=agent_id,
             name="LiteratureAgent",
             description="文献调研 Agent - 搜索、筛选和总结相关论文"
         )
         self.max_papers = max_papers
-        self._use_real_api = True  # 切换到真实 API
+        self.local_dirs = local_dirs or []
+        self.enable_crawler = enable_crawler
+        self._use_real_api = True
 
     def get_capabilities(self) -> list[str]:
         return [
             "search_papers - 搜索论文",
+            "scan_local_directory - 扫描本地目录",
+            "crawl_websites - 爬取学术网站",
             "extract_abstract - 提取摘要",
             "deduplicate_papers - 去重",
             "summarize_literature - 生成综述",
@@ -57,14 +75,24 @@ class LiteratureAgent(BaseAgent):
             search_query = input_data.get("search_query", "")
             keywords = input_data.get("keywords", [])
             limit = input_data.get("limit", self.max_papers)
+            local_dirs = input_data.get("local_dirs", self.local_dirs)
+            use_crawler = input_data.get("use_crawler", self.enable_crawler)
+            use_mock = input_data.get("use_mock", False)
 
             logger.info(f"开始文献调研：query='{search_query}', keywords={keywords}, limit={limit}")
 
             # 发送进度更新
             self.send_progress(1, 5, "正在搜索论文...")
 
-            # 调用 MCP 工具搜索论文
-            papers = self._search_papers(search_query, keywords, limit)
+            # 调用多种来源搜索论文
+            papers = self._search_papers(
+                search_query,
+                keywords,
+                limit,
+                local_dirs,
+                use_crawler,
+                use_mock,
+            )
 
             self.send_progress(2, 5, f"找到 {len(papers)} 篇论文")
 
@@ -112,24 +140,71 @@ class LiteratureAgent(BaseAgent):
                 }
             )
 
-    def _search_papers(self, query: str, keywords: list[str], limit: int) -> list[dict]:
+    def _search_papers(
+        self,
+        query: str,
+        keywords: list[str],
+        limit: int,
+        local_dirs: list[str] = None,
+        use_crawler: bool = False,
+        use_mock: bool = False,
+    ) -> list[dict]:
         """
-        搜索论文
+        搜索论文（多来源）
 
-        使用 MCP 工具搜索 arXiv 和 Semantic Scholar
+        来源：
+        1. arXiv + Semantic Scholar API
+        2. 本地目录扫描
+        3. 学术网站爬虫（CNKI 等）
+        4. 模拟数据（测试用）
         """
+        all_papers = []
+
+        # 1. 如果使用模拟数据模式
+        if use_mock:
+            mock_papers = self._mock_search(query, keywords, limit)
+            logger.info(f"使用模拟数据：{len(mock_papers)} 篇论文")
+            return mock_papers
+
+        # 2. API 搜索（arXiv + Semantic Scholar）
         if self._use_real_api:
             try:
-                # 使用真实 API 搜索
-                papers = search_papers(query, max_results=limit)
-                if papers:
-                    logger.info(f"真实 API 搜索到 {len(papers)} 篇论文")
-                    return papers
+                api_papers = search_papers(query, max_results=limit)
+                if api_papers:
+                    logger.info(f"API 搜索到 {len(api_papers)} 篇论文")
+                    all_papers.extend(api_papers)
             except Exception as e:
-                logger.warning(f"真实 API 搜索失败，回退到模拟数据：{e}")
+                logger.warning(f"API 搜索失败，回退到模拟数据：{e}")
+                all_papers.extend(self._mock_search(query, keywords, limit))
 
-        # 回退到模拟数据
-        return self._mock_search(query, keywords, limit)
+        # 3. 本地目录扫描
+        if local_dirs:
+            for directory in local_dirs:
+                if Path(directory).exists():
+                    try:
+                        local_papers = scan_local_papers(directory)
+                        if local_papers:
+                            logger.info(f"本地目录扫描到 {len(local_papers)} 篇论文")
+                            all_papers.extend(local_papers)
+                    except Exception as e:
+                        logger.warning(f"本地搜索失败：{e}")
+
+        # 4. 学术网站爬虫
+        if use_crawler:
+            try:
+                # 优先使用 CNKI（中文论文）
+                crawler_papers = search_academic_websites(
+                    query,
+                    sources=["cnki"],
+                    max_results=limit // 2,
+                )
+                if crawler_papers:
+                    logger.info(f"网站爬取到 {len(crawler_papers)} 篇论文")
+                    all_papers.extend(crawler_papers)
+            except Exception as e:
+                logger.warning(f"网站爬取失败：{e}")
+
+        return all_papers
 
     def _mock_search(self, query: str, keywords: list[str], limit: int) -> list[dict]:
         """模拟搜索结果（用于测试）"""

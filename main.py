@@ -158,6 +158,57 @@ def run_workflow_stage(cli: EnhancedCLI, workflow_engine: WorkflowEngine, contex
         # 运行确认点交互
         confirmed, user_data = cli.run_confirmation(cp_id, cp_info["name"], cp_context)
 
+        # 处理 CP2 的特殊情况：重新扫描
+        if cp_id == "cp2" and not confirmed and user_data and user_data.get("rescan"):
+            source = user_data.get("source")
+            if source == "local":
+                directory = user_data.get("directory")
+                print_status("info", f"从本地目录重新扫描：{directory}")
+                context["local_dirs"] = [directory]
+            elif source == "crawler":
+                print_status("info", "使用网站爬取模式")
+                context["use_crawler"] = True
+
+            # 重新执行阶段
+            result = workflow_engine.execute_stage(current_stage, context)
+            if result.get("success"):
+                print_status("success", f"阶段 {stage.name} 执行完成")
+                for stage_result in result.get("results", []):
+                    if stage_result.get("response", {}).payload.get("success"):
+                        agent_id = stage_result["agent"]
+                        context[agent_id] = stage_result["response"].payload.get("result", {})
+                # 再次进入 CP2 确认
+                confirmed, user_data = cli.run_confirmation(cp_id, cp_info["name"], context.get("papers", {}))
+
+            if not confirmed:
+                print_status("warning", "操作已取消")
+                return
+            if user_data:
+                context.update(user_data)
+            continue
+
+        # 处理 CP2 使用模拟数据
+        if cp_id == "cp2" and user_data and user_data.get("use_mock"):
+            print_status("info", "使用模拟数据（测试模式）")
+            context["use_mock"] = True
+            # 重新执行阶段，使用模拟数据
+            result = workflow_engine.execute_stage(current_stage, context)
+            if result.get("success"):
+                print_status("success", f"阶段 {stage.name} 执行完成")
+                for stage_result in result.get("results", []):
+                    if stage_result.get("response", {}).payload.get("success"):
+                        agent_id = stage_result["agent"]
+                        context[agent_id] = stage_result["response"].payload.get("result", {})
+                # 再次进入 CP2 确认
+                confirmed, user_data = cli.run_confirmation(cp_id, cp_info["name"], context.get("papers", {}))
+
+            if not confirmed:
+                print_status("warning", "操作已取消")
+                return
+            if user_data:
+                context.update(user_data)
+            continue
+
         if not confirmed:
             print_status("warning", "操作已取消")
             return
